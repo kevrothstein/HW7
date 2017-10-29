@@ -2,7 +2,7 @@ import unittest
 import tweepy
 import requests
 import json
-
+import twitter_info
 ## SI 206 - HW
 ## COMMENT WITH:
 ## Your section day/time: Wednesday 6-7pm
@@ -46,10 +46,10 @@ import json
 ## Get your secret values to authenticate to Twitter. You may replace each of these 
 ## with variables rather than filling in the empty strings if you choose to do the secure way 
 ## for EC points
-consumer_key = "eyCduc2DjFruOYiVdlvry0GxI" 
-consumer_secret = "X8EON4DOWHoykCqgJHCe8SvOvvpkZIsZSL09M70gIVjzk6qyvO"
-access_token = "192260169-mzUrqEeNbWBSIZ5Wygp5L9zB3uMLyT3pB4R66ROV"
-access_token_secret = "dAGlMXkoa82bEHx8PO0XodiIAiAUM5pIwqhmd3b22YDTB"
+consumer_key = twitter_info.consumer_key 
+consumer_secret = twitter_info.consumer_secret
+access_token = twitter_info.access_token
+access_token_secret = twitter_info.access_token_secret
 ## Set up your authentication to Twitter
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
@@ -66,24 +66,41 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 cachefile = "cache_data.json"
 
 try:
-	cache_file = 
-
-
+	cache_the_file = open(cache_file,'r')
+	cache_contents = cache_the_file.read()
+	cache_diction = json.loads(cache_contents)
+except:
+	cache_diction = {}	
 
 ## 2. Write a function to get twitter data that works with the caching pattern, 
 ## 		so it either gets new data or caches data, depending upon what the input 
 ##		to search for is. 
-
+word_input = input('enter a word')
+def twitter_data(word_input):
+	word = word_input
+	if word in cache_diction:
+		results = cache_diction[word]
+	else:
+		results = api.search(q = word_input)
+		cache_diction[word] = results
+		f = open(cachefile, 'w')
+		f.write(json.dumps(cache_diction))
+		f.close()
+	the_results = results['statuses']
+	return the_results		
 
 
 ## 3. Using a loop, invoke your function, save the return value in a variable, and explore the 
 ##		data you got back!
-
-
 ## 4. With what you learn from the data -- e.g. how exactly to find the 
 ##		text of each tweet in the big nested structure -- write code to print out 
 ## 		content from 5 tweets, as shown in the linked example.
-
+for tweet in twitter_data(word_input)[0:3]:
+	print(tweet['text'])
+	print(tweet['created_at'])
+	print("\n")
+	
+#print(twitter_data(word_input))
 
 
 
