@@ -56,35 +56,35 @@ auth.set_access_token(access_token, access_token_secret)
 # Set up library to grab stuff from twitter with your authentication, and 
 # return it in a JSON-formatted way
 
-api = tweepy.API(auth, parser=tweepy.parsers.JSONParser()) 
+api = tweepy.API(auth, parser=tweepy.parsers.JSONParser()) #Set up library to get data from Twitter 
 
 ## Write the rest of your code here!
 
 #### Recommended order of tasks: ####
 ## 1. Set up the caching pattern start -- the dictionary and the try/except 
 ## 		statement shown in class.
-cachefile = "cache_data.json"
+cachefile = "cache_data.json" #creating my json file name
 
 try:
 	cache_the_file = open(cache_file,'r')
 	cache_contents = cache_the_file.read()
-	cache_diction = json.loads(cache_contents)
+	cache_diction = json.loads(cache_contents) #load data into a dictionary
 except:
 	cache_diction = {}	
 
 ## 2. Write a function to get twitter data that works with the caching pattern, 
 ## 		so it either gets new data or caches data, depending upon what the input 
 ##		to search for is. 
-word_input = input('enter a word')
+word_input = input('enter a word') #input word to find/get data off twitter
 def twitter_data(word_input):
 	word = word_input
 	if word in cache_diction:
-		results = cache_diction[word]
+		results = cache_diction[word] #grab data from cache
 	else:
-		results = api.search(q = word_input)
-		cache_diction[word] = results
-		f = open(cachefile, 'w')
-		f.write(json.dumps(cache_diction))
+		results = api.search(q = word_input) #get data from internet
+		cache_diction[word] = results #add to dictionary 
+		f = open(cachefile, 'w') #open cache file, w = writing
+		f.write(json.dumps(cache_diction)) #make dictionary into json formatted string
 		f.close()
 	the_results = results['statuses']
 	return the_results		
