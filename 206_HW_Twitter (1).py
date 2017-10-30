@@ -68,6 +68,7 @@ cachefile = "cache_data.json" #creating my json file name
 try:
 	cache_the_file = open(cache_file,'r')
 	cache_contents = cache_the_file.read()
+	cache_the_file.close() #close file
 	cache_diction = json.loads(cache_contents) #load data into a dictionary
 except:
 	cache_diction = {}	
@@ -75,19 +76,23 @@ except:
 ## 2. Write a function to get twitter data that works with the caching pattern, 
 ## 		so it either gets new data or caches data, depending upon what the input 
 ##		to search for is. 
-word_input = input('enter a word') #input word to find/get data off twitter
-def twitter_data(word_input):
-	word = word_input
+def twitter_data(word):
 	if word in cache_diction:
-		results = cache_diction[word] #grab data from cache
+		print ('caching')
+		return cache_diction[word]
 	else:
-		results = api.search(q = word_input) #get data from internet
-		cache_diction[word] = results #add to dictionary 
+		print ('fetching')
+		api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
+		tweet = api.search(word)
+		data = {}
+
+		for kevin in tweet['statuses']:
+			data[kevin['text']] = kevin['created_at']
+		cache_diction[word] = data 
 		f = open(cachefile, 'w') #open cache file, w = writing
 		f.write(json.dumps(cache_diction)) #make dictionary into json formatted string
 		f.close()
-	the_results = results['statuses']
-	return the_results		
+	return data		
 
 
 ## 3. Using a loop, invoke your function, save the return value in a variable, and explore the 
@@ -95,12 +100,15 @@ def twitter_data(word_input):
 ## 4. With what you learn from the data -- e.g. how exactly to find the 
 ##		text of each tweet in the big nested structure -- write code to print out 
 ## 		content from 5 tweets, as shown in the linked example.
-for tweet in twitter_data(word_input)[0:3]:
-	print(tweet['text'])
-	print(tweet['created_at'])
+the_input = input('input a word/phrase')
+the_data = twitter_data(the_input)
+kev = 0 
+for tweet in the_data.keys():
+	print('text' + tweet)
+	print('created_at' + the_data[tweet])
 	print("\n")
+	kev += 1
 	
-#print(twitter_data(word_input))
 
 
 
